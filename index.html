@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+
+<style>
+
+    #mainDisplay {
+        display : flex;
+    }
+
+    .labelContainer {
+        position : absolute;
+        top : 10px;
+        left : 310px;
+        font-family : Arial, sans-serif;
+        font-weight: 900;
+        background-color : rgba(255,255,255, 0.5);
+        text-shadow: 3px 3px 8px #FFFFFF;
+        padding : 5px;
+        border : 3px solid black;
+        font-size : 10px;   
+    }
+
+    canvas {
+        border : 1px solid black;
+    }
+
+</style>
+	
+</head>
+
+<body>
+
+<div id = 'mainDisplay'>
+    <div id = 'gui'></div>
+    <div id = 'video'></div>
+    <div id = 'crossSection'></div>
+</div>
+
+</body>
+
+<script src="js/d3.min.js"></script>
+<script src="js/video.js"></script>
+<script src="js/noiseWidget.js"></script>
+
+</html>
