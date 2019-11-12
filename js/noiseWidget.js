@@ -134,12 +134,31 @@ var crossLine = crossSection.append('g').append('path')
                 .attr("fill", "none")
                 .attr("stroke", "black")
                 .attr("stroke-width", 2)
+
+var barBuffer = 10;
+
+var meanIndicator = crossSection.append('rect')
+                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('height',2)
+                    .attr('x',120 - barBuffer/2)
+
+
+var upperLim =  crossSection.append('rect')
+                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('height',2)
+                    .attr('x',120 - barBuffer/2)
+
+var lowerLim =  crossSection.append('rect')
+                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('height',2)
+                    .attr('x',120 - barBuffer/2)
+
 function animateLine(){
     var lineProfile = [];
     var nSTDS = 2.5;
     var noiseLevel = Math.sqrt( cameras[0].readNoise**2 + video.featureBrightness)
     var cy = d3.scaleLinear()
-        .domain([0 - nSTDS * noiseLevel, video.featureBrightness + nSTDS * noiseLevel])
+        .domain([-10, 120])//video.featureBrightness + nSTDS * noiseLevel])
         .range([noiseWidget.boxHeight - noiseWidget.boxMargin + 20 , noiseWidget.boxMargin + 30]).clamp(true)
     cameras[0].simImage.data.slice(150*300,151*300).forEach(function(d,i){
         
@@ -149,7 +168,16 @@ function animateLine(){
         }
     });
 
+    var roiSubset = cameras[0].simImage.data.slice(150*300 + 120 ,151*300 - 120);
+    var mean = roiSubset.reduceRight(function(x,y){return x+y}) / (video.featureSigma*2)
+    var variance = roiSubset.map(x => (x-mean)**2 ).reduceRight(function(x,y){return x+y}) / (video.featureSigma*2)
+    var sd = Math.sqrt(variance)
+
     crossLine.attr('d', crossLineGenerator(lineProfile))
+    meanIndicator.attr('fill','red').attr('y', cy(mean))
+    upperLim.attr('fill','green').attr('y', cy(mean+sd))
+    lowerLim.attr('fill','green').attr('y', cy(mean-sd))
+    console.log(mean/sd)
 
 }
 

@@ -14,7 +14,7 @@ var video = {
  'wavelength' : 500, // wavelength of light incident on camera, in nm
  'featureBrightness' : 10, // peak brightness of the feature in photons / counts / whatever
  'activeDataSet' : 0, // which data set is currently active
- 'featureSigma' : 900,
+ 'featureSigma' : 30,
 }
 
 
@@ -85,7 +85,7 @@ function Camera(paramObj){
     self.readNoiseFast = 2; // rms read noise for slowest readout
     
     self.CIC = 0; // CIC in events / pixel / frame
-    self.offset = 2; // offset in counts for the fake ADC
+    self.offset = 0; // offset in counts for the fake ADC
     self.featureSigma = 10; // FWHM of image feature
     self.QE = 1; // camera quantum efficiency (QE), range from 0 to 1
     
@@ -218,7 +218,7 @@ function Camera(paramObj){
                     var r = Math.sqrt( (j - offsetY + objPos[0])**2 + (i - offsetX + objPos[1])**2 )
                     //var amplitude = Math.exp( -1 * (r**2) / fSigma );
                     var amplitude = 0
-                    if (r**2 < video.featureSigma){
+                    if (r**2 < video.featureSigma**2){
                         amplitude = 1;
                     }
 
