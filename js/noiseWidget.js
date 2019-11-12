@@ -74,7 +74,7 @@ svg1.append('path')
 
 svg1.append('g')
     .attr("transform", "translate(0," + (Number(svg1.attr('height')) - margin) + ")")
-    .call(d3.axisBottom(x).tickValues([1,10,100]).tickFormat(d=>d))
+    .call(d3.axisBottom(x).tickValues([0.1,1,10,100]).tickFormat(d=>d))
 
 svg1.append('g')
     .attr("transform", "translate(" + margin + ")")
@@ -100,6 +100,8 @@ svg1.append('g')
 
 
 var knob = svg1.append('circle').attr('cx', x(10)).attr('cy', y(sn(10))).attr('r', 10)
+knob.style('stroke','black')
+knob.style('fill','#555 ')
 
 var localScale = d3.scaleLinear()
         .domain([margin,Number(svg1.attr('height')) - margin])
@@ -138,7 +140,7 @@ function animateLine(){
     var noiseLevel = Math.sqrt( cameras[0].readNoise**2 + video.featureBrightness)
     var cy = d3.scaleLinear()
         .domain([0 - nSTDS * noiseLevel, video.featureBrightness + nSTDS * noiseLevel])
-        .range([noiseWidget.boxHeight-noiseWidget.boxMargin , noiseWidget.boxMargin]).clamp(true)
+        .range([noiseWidget.boxHeight - noiseWidget.boxMargin + 20 , noiseWidget.boxMargin + 30]).clamp(true)
     cameras[0].simImage.data.slice(150*300,151*300).forEach(function(d,i){
         
         

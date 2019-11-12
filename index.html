@@ -10,8 +10,8 @@
 
     .labelContainer {
         position : absolute;
-        top : 10px;
-        left : 310px;
+        top : 245px;
+        left : 10px;
         font-family : Arial, sans-serif;
         font-weight: 900;
         background-color : rgba(255,255,255, 0.5);
@@ -19,6 +19,25 @@
         padding : 5px;
         border : 3px solid black;
         font-size : 10px;   
+    }
+
+    .subLabel {
+        position : absolute;
+        top : 5px;
+        left : 60px;
+        width: 180px;
+        text-align: center;
+        font-family : Arial, sans-serif;
+        font-weight: 900;
+        background-color : rgba(255,255,255, 0.5);
+        text-shadow: 3px 3px 8px #FFFFFF;
+        padding : 2px;
+        border : 1px solid black;
+        font-size : 14px; 
+    }
+
+    .triptych {
+        position : relative;
     }
 
     canvas {
@@ -31,10 +50,23 @@
 
 <body>
 
-<div id = 'mainDisplay'>
-    <div id = 'gui'></div>
-    <div id = 'video'></div>
-    <div id = 'crossSection'></div>
+<div id = 'mainDisplay' class = 'triptych'>
+    <div id = 'gui'>
+        <div class = "subLabel">
+            Signal : Noise
+        </div>
+    </div>
+
+    <div id = 'video' class = 'triptych'>
+        <div class = "subLabel">
+                Simulated Video
+        </div>
+    </div>
+    <div id = 'crossSection' class = 'triptych'>
+            <div class = "subLabel">
+                    Simulated Line Profile
+            </div>
+    </div>
 </div>
 
 </body>

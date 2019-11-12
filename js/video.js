@@ -81,17 +81,17 @@ function Camera(paramObj){
     self.yPixelSize = 13; // y pixel size in microns
     
     self.readNoise = 2; // rms read noise in electrons
-    self.readNoiseSlow = 1; // rms read noise for slow readout
-    self.readNoiseFast = 3; // rms read noise for slowest readout
+    self.readNoiseSlow = 2; // rms read noise for slow readout
+    self.readNoiseFast = 2; // rms read noise for slowest readout
     
     self.CIC = 0; // CIC in events / pixel / frame
     self.offset = 2; // offset in counts for the fake ADC
     self.featureSigma = 10; // FWHM of image feature
     self.QE = 1; // camera quantum efficiency (QE), range from 0 to 1
     
-    self.frameRateHz = 10; // camera framerate in relative units
-    self.frameRateHzFast = 20; // camera framerate for fast mode
-    self.frameRateHzSlow = 5; // camera framerate for slow mode
+    self.frameRateHz = 1; // camera framerate in relative units
+    self.frameRateHzFast = 1; // camera framerate for fast mode
+    self.frameRateHzSlow = 1; // camera framerate for slow mode
 
     self.darkCurrent = 0.00001; // camera dark current in e/pix/sec
     self.emGain = 0; // em gain flag
@@ -422,7 +422,7 @@ function animate(){
         //objPos[1] = modRange( objPos[1] + speedMultiplier * (Math.random() - 0.5), -32, 32);
 
         function testFrameRate(cam){
-            if ( (delta % Math.round(1/cam.frameRateHz / frameRateMultiplier) == 0) || delta == 1 ){
+            if ( (delta % 7 == 0) || delta == 1 ){
                 cam.updateData();
                 cam.draw();
                 lineFunc();
