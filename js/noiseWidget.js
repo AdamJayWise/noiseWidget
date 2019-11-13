@@ -39,10 +39,15 @@ var svg1 = createSVG({'target':'#gui'})
 
 // create fake s/n data
 var snData = [];
+var snDataIdeal = [];
 var numDataPoints = 100;
 
 function sn(x){
     return cameras[0].QE * x / Math.sqrt(cameras[0].QE * x + cameras[0].readNoise**2) 
+}
+
+function snIdeal(x){
+    return Math.sqrt(x) 
 }
 
 for (var i = 0; i < numDataPoints; i++){
@@ -50,6 +55,12 @@ for (var i = 0; i < numDataPoints; i++){
     tempObj['x'] = i+1;
     tempObj['y'] = sn(i+1);
     snData[i] = tempObj;
+
+    var tempObjIdeal = {};
+    tempObjIdeal['x'] = i+1;
+    tempObjIdeal['y'] = snIdeal(i+1);
+    snDataIdeal[i] = tempObjIdeal;
+
 }
 
 // create line obj and draw line to SVG
@@ -71,6 +82,21 @@ svg1.append('path')
         .attr("fill", "none")
         .attr("stroke", "black")
         .attr("stroke-width", 2)
+
+svg1.append('path')
+        .attr('d', dataLine(snDataIdeal))
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray",4)
+
+// append shot noise limit text
+svg1.append('g')
+    .attr("transform","translate(100,135) rotate(-34)")
+    .append('text')
+    .style('font-size','14px')
+    .text('Shot Noise Limit')
+    .style('font-family',"sans-serif")
 
 svg1.append('g')
     .attr("transform", "translate(0," + (Number(svg1.attr('height')) - margin) + ")")
@@ -138,12 +164,22 @@ var crossLine = crossSection.append('g').append('path')
 var barBuffer = 20;
 var barOp = 0.7;
 
+
+
 var meanIndicator = crossSection.append('rect')
                     .attr('width', video.featureSigma*2 + barBuffer)
                     .attr('height',2)
                     .attr('x',120 - barBuffer/2)
                     .attr('opacity', barOp)
 
+var meanLabel = crossSection.append('text')
+                    .text('Signal Mean')
+                    .attr('fill','red')
+                    .attr('x',230)
+                    .attr('text-anchor','middle')
+                    .style('font-size','12px')
+                    .attr('dominant-baseline','middle')
+                    .style('text-shadow','2px 2px 20px #FFF')
 
 var upperLim =  crossSection.append('rect')
                     .attr('width', video.featureSigma*2 + barBuffer)
@@ -185,6 +221,7 @@ function animateLine(){
 
     crossLine.attr('d', crossLineGenerator(lineProfile))
     meanIndicator.attr('fill','red').attr('y', cy(mean))
+    meanLabel.attr('fill','red').attr('y', cy(mean))
     upperLim.attr('fill','green').attr('y', cy(mean+sd))
     lowerLim.attr('fill','green').attr('y', cy(mean-sd))
     bug.attr('fill','black').attr('y', y(mean/sd))
