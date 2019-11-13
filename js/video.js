@@ -10,7 +10,7 @@ var speedMultiplier = 0.5; // fudge factor for random walk speed of the feature
 
 var video = {
  'mode' : 'Slow', // fast or slow imaging mode
- 'exposureTime' : 30, // exposure time in seconds
+ 'exposureTime' : 0, // exposure time in seconds
  'wavelength' : 500, // wavelength of light incident on camera, in nm
  'featureBrightness' : 10, // peak brightness of the feature in photons / counts / whatever
  'activeDataSet' : 0, // which data set is currently active
@@ -87,7 +87,7 @@ function Camera(paramObj){
     self.CIC = 0; // CIC in events / pixel / frame
     self.offset = 0; // offset in counts for the fake ADC
     self.featureSigma = 10; // FWHM of image feature
-    self.QE = 1; // camera quantum efficiency (QE), range from 0 to 1
+    self.QE = 0.8; // camera quantum efficiency (QE), range from 0 to 1
     
     self.frameRateHz = 1; // camera framerate in relative units
     self.frameRateHzFast = 1; // camera framerate for fast mode
@@ -207,9 +207,11 @@ function Camera(paramObj){
 
         // right now, this adds a gauss feature to the random readout noise data
         if (1){
+
+            video.roi = [];
+
             var offsetX = Math.floor(self.xPixels/2);
             var offsetY = Math.floor(self.yPixels/2)
-            var featureSize = 15;
             var featureBrightness = video.featureBrightness  ;
             var fSigma = video.featureSigma; //feature sigma
             var q = 0;
@@ -217,7 +219,7 @@ function Camera(paramObj){
                 for (var j = 0 ; j < self.yPixels; j++){
                     var r = Math.sqrt( (j - offsetY + objPos[0])**2 + (i - offsetX + objPos[1])**2 )
                     //var amplitude = Math.exp( -1 * (r**2) / fSigma );
-                    var amplitude = 0
+                    var amplitude = 0;
                     if (r**2 < video.featureSigma**2){
                         amplitude = 1;
                     }
@@ -226,12 +228,15 @@ function Camera(paramObj){
                     if(amplitude*video.featureBrightness >= cutoff){
                         if (self.emGain == 0){
                             q = poissonSample( self.QE * video.featureBrightness * amplitude, 1)[0];
+
                         }
 
+                        /*
                         if (self.emGain == 1){
                             q = poissonSample( self.QE * video.featureBrightness * amplitude, 1)[0];
                             q = poissonSample( q , 1)[0];
                         }
+                        */
 
                         // add dark current if in slow mode
 
@@ -254,6 +259,10 @@ function Camera(paramObj){
                     }
 
                     self.simImage.set(i,j, q + darkCounts + self.simImage.get(i,j) );
+                    
+                    if (amplitude == 1){
+                        video.roi.push(self.simImage.get(i,j))
+                    }
                 }
             }
         }
@@ -422,7 +431,7 @@ function animate(){
         //objPos[1] = modRange( objPos[1] + speedMultiplier * (Math.random() - 0.5), -32, 32);
 
         function testFrameRate(cam){
-            if ( (delta % 7 == 0) || delta == 1 ){
+            if ( (delta %  4 == 0) || delta == 1 ){
                 cam.updateData();
                 cam.draw();
                 lineFunc();

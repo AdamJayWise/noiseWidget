@@ -42,7 +42,7 @@ var snData = [];
 var numDataPoints = 100;
 
 function sn(x){
-    return x / Math.sqrt(x + cameras[0].readNoise**2) 
+    return cameras[0].QE * x / Math.sqrt(cameras[0].QE * x + cameras[0].readNoise**2) 
 }
 
 for (var i = 0; i < numDataPoints; i++){
@@ -135,23 +135,33 @@ var crossLine = crossSection.append('g').append('path')
                 .attr("stroke", "black")
                 .attr("stroke-width", 2)
 
-var barBuffer = 10;
+var barBuffer = 20;
+var barOp = 0.7;
 
 var meanIndicator = crossSection.append('rect')
                     .attr('width', video.featureSigma*2 + barBuffer)
                     .attr('height',2)
                     .attr('x',120 - barBuffer/2)
+                    .attr('opacity', barOp)
 
 
 var upperLim =  crossSection.append('rect')
                     .attr('width', video.featureSigma*2 + barBuffer)
                     .attr('height',2)
                     .attr('x',120 - barBuffer/2)
+                    .attr('opacity', barOp)
 
 var lowerLim =  crossSection.append('rect')
                     .attr('width', video.featureSigma*2 + barBuffer)
                     .attr('height',2)
                     .attr('x',120 - barBuffer/2)
+                    .attr('opacity', barOp)
+
+var bug = svg1.append('rect')
+    .attr('width', 10)
+    .attr('height',2)
+    .attr('x',x(1)-5)
+    .attr('opacity', barOp)
 
 function animateLine(){
     var lineProfile = [];
@@ -168,17 +178,18 @@ function animateLine(){
         }
     });
 
-    var roiSubset = cameras[0].simImage.data.slice(150*300 + 120 ,151*300 - 120);
-    var mean = roiSubset.reduceRight(function(x,y){return x+y}) / (video.featureSigma*2)
-    var variance = roiSubset.map(x => (x-mean)**2 ).reduceRight(function(x,y){return x+y}) / (video.featureSigma*2)
+    var roiSubset = video.roi;//cameras[0].simImage.data.slice(149*300 + 122 ,150*300 - 120);
+    var mean = roiSubset.reduceRight(function(x,y){return x+y}) / roiSubset.length
+    var variance = roiSubset.map(x => (x-mean)**2 ).reduceRight(function(x,y){return x+y}) / roiSubset.length
     var sd = Math.sqrt(variance)
 
     crossLine.attr('d', crossLineGenerator(lineProfile))
     meanIndicator.attr('fill','red').attr('y', cy(mean))
     upperLim.attr('fill','green').attr('y', cy(mean+sd))
     lowerLim.attr('fill','green').attr('y', cy(mean-sd))
-    console.log(mean/sd)
-
+    bug.attr('fill','black').attr('y', y(mean/sd))
+    //console.log(mean, sd, mean/sd)
+    //console.log(roiSubset)
 }
 
 lineFunc = animateLine
