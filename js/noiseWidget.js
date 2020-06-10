@@ -29,7 +29,7 @@ function createSVG(paramObj){
                     .attr('id', params['id'])
                     .attr('height', 300)
                     .attr('width', 300)
-                    .style('border', '1px solid #999')
+                    //.style('border', '1px solid #999')
 
     return svg
     
@@ -115,7 +115,8 @@ svg1.append('g')
     .attr("font-family", "sans-serif")
     .attr("font-family", "sans-serif")
     .attr('font-size','10pt')
-svg1.append('g')
+
+    svg1.append('g')
     .attr('transform','translate(15,220), rotate(-90)')
     .append('text')
     .text('Signal to Noise Ratio')
@@ -123,11 +124,14 @@ svg1.append('g')
     .attr("font-family", "sans-serif")
     .attr('font-size','10pt')
 
+var knob = svg1.append('circle')
+    .attr('cx', x(video.featureBrightness))
+    .attr('cy', y(sn(video.featureBrightness)))
+    .attr('r', 10)
 
-
-var knob = svg1.append('circle').attr('cx', x(10)).attr('cy', y(sn(10))).attr('r', 10)
 knob.style('stroke','black')
-knob.style('fill','#555 ')
+knob.attr('stroke-width','2px')
+knob.style('fill','#ddd ')
 
 var localScale = d3.scaleLinear()
         .domain([margin,Number(svg1.attr('height')) - margin])
@@ -150,7 +154,7 @@ var crossSection = d3.select('#crossSection')
                     .append('svg')
                     .attr('width',noiseWidget.boxWidth)
                     .attr('height',noiseWidget.boxHeight)
-                    .style('border','1px solid gray')
+                    //.style('border','1px solid gray')
 
 var crossLineGenerator = d3.line().x(d=>d.x).y(d=>d.y)
 var cx = d3.scaleLinear().domain([0,300]).range([0,noiseWidget.boxWidth]).clamp(true)
@@ -167,9 +171,9 @@ var barOp = 0.7;
 
 
 var meanIndicator = crossSection.append('rect')
-                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('width', video.featureSigma*2 + barBuffer + 10)
                     .attr('height',2)
-                    .attr('x',120 - barBuffer/2)
+                    .attr('x',120 - barBuffer/2 - 5)
                     .attr('opacity', barOp)
 
 var meanLabel = crossSection.append('text')
@@ -221,7 +225,7 @@ function animateLine(){
 
     crossLine.attr('d', crossLineGenerator(lineProfile))
     meanIndicator.attr('fill','red').attr('y', cy(mean))
-    meanLabel.attr('fill','red').attr('y', cy(mean))
+    meanLabel.attr('fill','red').attr('y', Math.min(cy(mean), 270 ))
     upperLim.attr('fill','green').attr('y', cy(mean+sd))
     lowerLim.attr('fill','green').attr('y', cy(mean-sd))
     bug.attr('fill','black').attr('y', y(mean/sd))
