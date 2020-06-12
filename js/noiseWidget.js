@@ -150,14 +150,51 @@ function dragging(){
 knob.call(d3.drag().on('drag', dragging))
 
 
+// show the simulated line profile =========================
+
 var crossSection = d3.select('#crossSection')
                     .append('svg')
                     .attr('width',noiseWidget.boxWidth)
                     .attr('height',noiseWidget.boxHeight)
                     //.style('border','1px solid gray')
 
-var crossLineGenerator = d3.line().x(d=>d.x).y(d=>d.y)
-var cx = d3.scaleLinear().domain([0,300]).range([0,noiseWidget.boxWidth]).clamp(true)
+var cx = d3.scaleLinear()
+    .domain([0,300])
+    .range([margin,noiseWidget.boxWidth - margin])
+    .clamp(true)
+
+var cy = d3.scaleLinear()
+    .domain([-10, 120])//video.featureBrightness + nSTDS * noiseLevel])
+    .range([Number(svg1.attr('height')) - margin, 0 + margin])
+    .clamp(true) // x graph scale
+
+var crossLineGenerator = d3.line().x(d=>cx(d.x)).y(d=>cy(d.y))
+
+crossSection.append('g')
+    .attr("transform", "translate(0," + (Number(crossSection.attr('height')) - margin) + ")")
+    .call(d3.axisBottom(cx).tickValues([150, 300 ]).tickFormat(d=>d))
+
+crossSection.append('g')
+    .attr("transform", "translate(" + margin + ")")
+    .call(d3.axisLeft(cy).tickValues([0, 100]))
+
+// add text labels
+crossSection.append('g')
+    .attr('transform','translate(130,290)')
+    .append('text')
+    .text('Pixel #')
+    .attr('fill','black')
+    .attr("font-family", "sans-serif")
+    .attr("font-family", "sans-serif")
+    .attr('font-size','10pt')
+
+crossSection.append('g')
+    .attr('transform','translate(20,180), rotate(-90)')
+    .append('text')
+    .text('Counts, a.u.')
+    .attr('fill','black')
+    .attr("font-family", "sans-serif")
+    .attr('font-size','10pt')
 
 
 var crossLine = crossSection.append('g').append('path')
@@ -207,14 +244,12 @@ function animateLine(){
     var lineProfile = [];
     var nSTDS = 2.5;
     var noiseLevel = Math.sqrt( cameras[0].readNoise**2 + video.featureBrightness)
-    var cy = d3.scaleLinear()
-        .domain([-10, 120])//video.featureBrightness + nSTDS * noiseLevel])
-        .range([noiseWidget.boxHeight - noiseWidget.boxMargin + 20 , noiseWidget.boxMargin + 30]).clamp(true)
+
     cameras[0].simImage.data.slice(150*300,151*300).forEach(function(d,i){
         
         
         if(d){
-            lineProfile.push({'x':i,'y':cy(d)})
+            lineProfile.push({'x':i,'y':d})
         }
     });
 
@@ -225,7 +260,7 @@ function animateLine(){
 
     crossLine.attr('d', crossLineGenerator(lineProfile))
     meanIndicator.attr('fill','red').attr('y', cy(mean))
-    meanLabel.attr('fill','red').attr('y', Math.min(cy(mean), 270 ))
+    meanLabel.attr('fill','red').attr('y', Math.min(cy(mean), 225 ))
     upperLim.attr('fill','green').attr('y', cy(mean+sd))
     lowerLim.attr('fill','green').attr('y', cy(mean-sd))
     bug.attr('fill','black').attr('y', y(mean/sd))
