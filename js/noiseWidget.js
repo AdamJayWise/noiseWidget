@@ -1,8 +1,8 @@
 console.log('noiseWidget.js, Adam Wise 2019')
 
 var noiseWidget = {
-    'boxWidth' : 300,
-    'boxHeight' : 300,
+    'boxWidth' : 200,
+    'boxHeight' : 200,
     'boxMargin' : 10,
 }
 
@@ -10,8 +10,8 @@ var noiseWidget = {
 
 function createSVG(paramObj){
     params = {
-        'height' : '300px',
-        'width' : '300px',
+        'height' : noiseWidget.boxHeight + 'px',
+        'width' : noiseWidget.boxWidth + 'px',
         'id' : 'defaultId',
         'margin' : 30, // margin in pixels
         'target' : 'body'
@@ -27,8 +27,8 @@ function createSVG(paramObj){
     var svg = d3.select(params['target'])
                     .append('svg')
                     .attr('id', params['id'])
-                    .attr('height', 300)
-                    .attr('width', 300)
+                    .attr('height', noiseWidget.boxHeight)
+                    .attr('width', noiseWidget.boxWidth)
                     //.style('border', '1px solid #999')
 
     return svg
@@ -92,9 +92,9 @@ svg1.append('path')
 
 // append shot noise limit text
 svg1.append('g')
-    .attr("transform","translate(100,135) rotate(-34)")
+    .attr("transform","translate(60,100) rotate(-34)")
     .append('text')
-    .style('font-size','14px')
+    .style('font-size','12px')
     .text('Shot Noise Limit')
     .style('font-family',"sans-serif")
 
@@ -108,7 +108,7 @@ svg1.append('g')
 
 // add text labels
 svg1.append('g')
-    .attr('transform','translate(100,290)')
+    .attr('transform',`translate(${noiseWidget.boxWidth/2-40}, ${noiseWidget.boxHeight - 10})`)
     .append('text')
     .text('Photons / Pixel')
     .attr('fill','black')
@@ -117,7 +117,7 @@ svg1.append('g')
     .attr('font-size','10pt')
 
     svg1.append('g')
-    .attr('transform','translate(15,220), rotate(-90)')
+    .attr('transform',`translate(15, ${noiseWidget.boxHeight - 40}), rotate(-90)`)
     .append('text')
     .text('Signal to Noise Ratio')
     .attr('fill','black')
@@ -159,7 +159,7 @@ var crossSection = d3.select('#crossSection')
                     //.style('border','1px solid gray')
 
 var cx = d3.scaleLinear()
-    .domain([0,300])
+    .domain([0, noiseWidget.boxWidth])
     .range([margin,noiseWidget.boxWidth - margin])
     .clamp(true)
 
@@ -172,7 +172,7 @@ var crossLineGenerator = d3.line().x(d=>cx(d.x)).y(d=>cy(d.y))
 
 crossSection.append('g')
     .attr("transform", "translate(0," + (Number(crossSection.attr('height')) - margin) + ")")
-    .call(d3.axisBottom(cx).tickValues([150, 300 ]).tickFormat(d=>d))
+    .call(d3.axisBottom(cx).tickValues([noiseWidget.boxWidth/2, noiseWidget.boxWidth ]).tickFormat(d=>d))
 
 crossSection.append('g')
     .attr("transform", "translate(" + margin + ")")
@@ -180,7 +180,7 @@ crossSection.append('g')
 
 // add text labels
 crossSection.append('g')
-    .attr('transform','translate(130,290)')
+    .attr('transform',`translate(${noiseWidget.boxWidth/2-20}, ${noiseWidget.boxHeight - 10})`)
     .append('text')
     .text('Pixel #')
     .attr('fill','black')
@@ -189,7 +189,7 @@ crossSection.append('g')
     .attr('font-size','10pt')
 
 crossSection.append('g')
-    .attr('transform','translate(20,180), rotate(-90)')
+    .attr('transform',`translate(15, ${noiseWidget.boxHeight - 60}), rotate(-90)`)
     .append('text')
     .text('Counts, a.u.')
     .attr('fill','black')
@@ -202,36 +202,36 @@ var crossLine = crossSection.append('g').append('path')
                 .attr("stroke", "black")
                 .attr("stroke-width", 2)
 
-var barBuffer = 20;
+var barBuffer = 10;
 var barOp = 0.7;
 
 
 
 var meanIndicator = crossSection.append('rect')
-                    .attr('width', video.featureSigma*2 + barBuffer + 10)
+                    .attr('width', cx(video.featureSigma))
                     .attr('height',2)
-                    .attr('x',120 - barBuffer/2 - 5)
+                    .attr('x', noiseWidget.boxWidth * (120/300) )
                     .attr('opacity', barOp)
 
 var meanLabel = crossSection.append('text')
                     .text('Signal Mean')
                     .attr('fill','red')
-                    .attr('x',230)
+                    .attr('x', noiseWidget.boxWidth/2 + 50)
                     .attr('text-anchor','middle')
                     .style('font-size','12px')
                     .attr('dominant-baseline','middle')
                     .style('text-shadow','2px 2px 20px #FFF')
 
 var upperLim =  crossSection.append('rect')
-                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('width', cx(video.featureSigma)/1.5)
                     .attr('height',2)
-                    .attr('x',120 - barBuffer/2)
+                    .attr('x', noiseWidget.boxWidth * (120/300))
                     .attr('opacity', barOp)
 
 var lowerLim =  crossSection.append('rect')
-                    .attr('width', video.featureSigma*2 + barBuffer)
+                    .attr('width', cx(video.featureSigma)/1.5)
                     .attr('height',2)
-                    .attr('x',120 - barBuffer/2)
+                    .attr('x', noiseWidget.boxWidth * (120/300))
                     .attr('opacity', barOp)
 
 var bug = svg1.append('rect')
@@ -245,7 +245,7 @@ function animateLine(){
     var nSTDS = 2.5;
     var noiseLevel = Math.sqrt( cameras[0].readNoise**2 + video.featureBrightness)
 
-    cameras[0].simImage.data.slice(150*300,151*300).forEach(function(d,i){
+    cameras[0].simImage.data.slice(cameras[0].xPixels/2 * noiseWidget.boxWidth, (cameras[0].xPixels/2 +1) * noiseWidget.boxHeight).forEach(function(d,i){
         
         
         if(d){
@@ -260,7 +260,7 @@ function animateLine(){
 
     crossLine.attr('d', crossLineGenerator(lineProfile))
     meanIndicator.attr('fill','red').attr('y', cy(mean))
-    meanLabel.attr('fill','red').attr('y', Math.min(cy(mean), 225 ))
+    meanLabel.attr('fill','red').attr('y', Math.min(cy(mean) - 10, noiseWidget.boxHeight * (225/300) ))
     upperLim.attr('fill','green').attr('y', cy(mean+sd))
     lowerLim.attr('fill','green').attr('y', cy(mean-sd))
     bug.attr('fill','black').attr('y', y(mean/sd))

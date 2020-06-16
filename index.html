@@ -6,11 +6,13 @@
 
     #mainDisplay {
         display : flex;
+        width : 754px;
+        border : 1px solid blue;
     }
 
     .labelContainer {
         position : absolute;
-        top : 245px;
+        top : 145px;
         left : 10px;
         font-family : sans-serif;
         font-weight: 900;
@@ -29,21 +31,21 @@
     .subLabel {
         position : absolute;
         top : 5px;
-        left : 60px;
-        width: 180px;
+        left : 40px;
+        width: 120px;
         text-align: center;
         font-family : sans-serif;
         font-weight: bold;
         background-color : rgba(255,255,255, 0.5);
         text-shadow: 3px 3px 8px #FFFFFF;
         padding : 2px;
-        border : 1px solid black;
         font-size : 14px; 
     }
 
 
     .triptych {
         position : relative;
+        width : 200px;
     }
 
 
@@ -60,12 +62,6 @@
     
 <p><h2>What Do Signal to Noise Plots Really Mean?</h2></p>
 
-<p><span style="font-weight: 400;">Discussions of camera performance are often accompanied by graphs plotting signal to noise ratio (SNR) against illumination intensity.&nbsp; This can be useful for describing sensitivity independent of a specific sample or imaging system.&nbsp; Deliver X amount of light to the focal plane, and you will get an image of signal to noise ratio Y.&nbsp; A higher SNR is - all else being equal - better for any application.&nbsp; You can learn more about </span><a href="https://andor.oxinst.com/learning/view/article/ccd-signal-to-noise-ratio"><span style="font-weight: 400;">how SNR is calculated</span></a><span style="font-weight: 400;"> and compare SNR curves across camera models with our </span><a href="https://andor.oxinst.com/signal-to-noise-calculator"><span style="font-weight: 400;">signal to noise calculator</span></a><span style="font-weight: 400;">.</span></p>
-
-<p><span style="font-weight: 400;">Still we might ask: how do these signal to noise values relate to actual measurements?&nbsp; What is the practical difference between SNR = 1.1 and SNR = 1.2? And how would you set up a real measurement system to compare with these idealized numbers? Rigorous answers to these questions are beyond the scope of this article, but a small example may be illustrative.</span></p>
-
-<p><span style="font-weight: 400;">Below is a simulated image represented on a virtual sensor.&nbsp; Flanking the image are a signal to noise graph on the left, and a line profile across the center of the image on the right. The only things that exist in this simulated world are a uniformly glowing circle on a completely dark background.&nbsp; There are no other light sources, no background, no autofluorescence.&nbsp; Any offset due to camera bias has been removed.&nbsp; This virtual sensor has a read noise of 2 electrons root mean square (RMS), and a quantum efficiency (QE) of 80%.&nbsp; Exposure times are short enough that dark current and the noise associated with it are negligible.&nbsp;</span></p>
-
 <div id = 'mainDisplay' class = 'triptych'>
     <div id = 'gui'>
         <div class = "subLabel">
@@ -80,22 +76,10 @@
     </div>
     <div id = 'crossSection' class = 'triptych'>
             <div class = "subLabel">
-                    Simulated Line Profile
+                    Line Profile
             </div>
     </div>
 </div>
-
-<p><span style="font-weight: 400;">You can interact with the simulation by clicking and dragging the circle on the signal to noise ratio graph to change the signal level.</span></p>
-
-<p><span style="font-weight: 400;">Pixels outside of the image of the circle buzz with read noise - noise generated when the sensor &lsquo;reads out&rsquo; or quantifies the photo-generated charge in a pixel.&nbsp; As these pixels don&rsquo;t carry any signal, they won&rsquo;t figure directly into our signal to noise ratio calculation.&nbsp; Pixels inside of the circle are uniformly illuminated with a mean value of &lambda; photons per pixel, with the sensor actually detecting a mean value of QE * &lambda; photons.&nbsp; Even though the mean level of illumination is uniform within the circle, we assume this relatively small number of photons arrive randomly in time, and in any particular measurement the actual number of counts per pixel is as a result </span><a href="https://en.wikipedia.org/wiki/Poisson_distribution"><span style="font-weight: 400;">Poisson-distributed</span></a><span style="font-weight: 400;">.&nbsp; The uncertainty caused by the random arrival of photons is referred to as Poisson or shot noise.</span></p>
-
-<p><span style="font-weight: 400;">In these simulated images, the signal to noise ratio of our circular feature is the signal (QE * &lambda;) divided by the sum of read noise and shot noise.&nbsp; EMCCD technology like that used in the Andor </span><a href="https://andor.oxinst.com/products/ixon-emccd-cameras"><span style="font-weight: 400;">iXon</span></a><span style="font-weight: 400;"> and </span><a href="https://andor.oxinst.com/products/newton-ccd-and-emccd-cameras/"><span style="font-weight: 400;">Newton</span></a><span style="font-weight: 400;"> cameras - can effectively eliminate read noise, but shot noise is impossible to remove.&nbsp; As a result we often see sensor performance compared to a &ldquo;Shot Noise Limit&rdquo;.&nbsp; This represents the best possible performance where the only remaining noise is the random nature of the signal itself.&nbsp; Note the bent shape of our simulated SNR curve - at very low levels of illumination, the read noise dominates.&nbsp; At higher light levels read noise becomes only a small contributor, and our curve pulls up and approaches the shot noise limit, but will never quite reach it due to less than perfect quantum efficiency.&nbsp; We can get close though - some back-illuminated cameras like the </span><a href="https://andor.oxinst.com/products/scmos-camera-series/sona-scmos"><span style="font-weight: 400;">Sona 4.2B-6</span></a><span style="font-weight: 400;"> can reach 95% quantum efficiency.&nbsp;</span></p>
-
-<p><span style="font-weight: 400;">As we&rsquo;re in control of this simulated image, we know the underlying ground-truth values of every parameter and can draw a curve precisely describing the relationship between the signal to noise ratio and illumination level - that&rsquo;s our nice smooth ideal curve.&nbsp; We can also try to estimate the SNR post-hoc with results of the simulation.&nbsp; Note the small bouncing tick on the y axis - this is the empirically calculated signal to noise ratio of the simulated image, made by taking the mean of the pixels inside the circle and dividing by the standard deviation of these same pixels.&nbsp; You can see it oscillates randomly, wildly at lower illumination levels and more stably at higher levels.&nbsp; This is a reminder that any individual attempt to to measure the SNR is subject to random error, and is only an estimate.</span></p>
-
-<p><span style="font-weight: 400;">It might be counter-intuitive that the circle can still be seen with an illumination of 1 photon per pixel and accompanying SNR &lt; 1.&nbsp; However, we are doing two things that make detection easier.&nbsp; First, the circle contains many pixels, so we&rsquo;re effectively pooling lots of measurements.&nbsp; If you examine the line profile - a much smaller sample pool - detecting the signal becomes significantly harder.&nbsp; Consider the challenge of </span><a href="https://andor.oxinst.com/learning/view/article/quantum-imaging-with-emccds-in-photon-counting-regime"><span style="font-weight: 400;">counting individual photons</span></a><span style="font-weight: 400;"> and the value of minimizing read noise and maximizing quantum efficiency becomes clear.&nbsp; Second, we know where the circle is meant to be - if we didn&rsquo;t know the size or shape of our expected image, we might be much less confident that we&rsquo;ve found our target.</span></p>
-
-<p><span style="font-weight: 400;">Hopefully we have shown that SNR as found in these plots is a simple but useful way of communicating camera sensitivity, even if it leaves out important aspects of performance like frame rate, dynamic range, broadband wavelength response, pixel uniformity and so on.&nbsp; We would look forward to discussing exactly how to provide the best camera for your specific application.</span></p>
 
 </div>
 

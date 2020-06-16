@@ -75,8 +75,8 @@ function Camera(paramObj){
     //default parameters
     console.log('setting parameters');
     self.name = 'Generic Camera'
-    self.xPixels = 300; // number of pixels in x dimension
-    self.yPixels = 300; // number of pixels in y dimension
+    self.xPixels = 200; // number of pixels in x dimension
+    self.yPixels = 200; // number of pixels in y dimension
     self.xPixelSize = 13; // x pixel size in microns
     self.yPixelSize = 13; // y pixel size in microns
     
